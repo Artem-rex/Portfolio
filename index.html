@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urbex · Руфинг · Workout · Экстрим</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ===== ОСНОВНОЙ ФОН ===== */
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            transition: background 0.6s ease, color 0.3s ease;
+            position: relative;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        /* ===== АНИМИРОВАННЫЙ ФОН (частицы) ===== */
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(50px);
+            opacity: 0.7;
+            will-change: transform;
+            transition: background 0.8s ease;
+        }
+
+        /* ===== ТЕМЫ С ЯРКИМИ ЦВЕТАМИ ===== */
+        body.theme-gold {
+            --bg-body: #0b0e14;
+            --particle1: rgba(255, 200, 100, 0.50);
+            --particle2: rgba(255, 160, 50, 0.45);
+            --particle3: rgba(255, 220, 150, 0.35);
+            --particle4: rgba(255, 180, 80, 0.55);
+            --particle5: rgba(200, 150, 50, 0.40);
+            --particle6: rgba(255, 210, 120, 0.30);
+            --glow-color: rgba(255, 200, 100, 0.15);
+        }
+
+        body.theme-darkred {
+            --bg-body: #0a0606;
+            --particle1: rgba(255, 60, 60, 0.60);
+            --particle2: rgba(220, 30, 30, 0.55);
+            --particle3: rgba(255, 100, 100, 0.45);
+            --particle4: rgba(255, 40, 40, 0.65);
+            --particle5: rgba(200, 20, 20, 0.50);
+            --particle6: rgba(255, 80, 80, 0.40);
+            --glow-color: rgba(255, 60, 60, 0.18);
+        }
+
+        body.theme-black {
+            --bg-body: #030303;
+            --particle1: rgba(200, 200, 200, 0.50);
+            --particle2: rgba(160, 160, 160, 0.45);
+            --particle3: rgba(220, 220, 220, 0.35);
+            --particle4: rgba(180, 180, 180, 0.55);
+            --particle5: rgba(140, 140, 140, 0.40);
+            --particle6: rgba(210, 210, 210, 0.30);
+            --glow-color: rgba(200, 200, 200, 0.15);
+        }
+
+        body {
+            background: var(--bg-body);
+            color: var(--text-primary);
+        }
+
+        /* ===== КАРТОЧКА ===== */
+        .card {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(23, 30, 42, 0.92);
+            border-radius: 2.8rem;
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--border-card), 0 0 100px var(--glow-color);
+            padding: 2.8rem 2.4rem;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* ===== ОСТАЛЬНЫЕ СТИЛИ ===== */
+        body.theme-gold {
+            --border-card: #2e384d;
+            --text-primary: #e0e5ee;
+            --text-secondary: #b8c4da;
+            --text-muted: #8593af;
+            --bg-category: rgba(31, 38, 54, 0.85);
+            --border-category: #313d55;
+            --shadow-color: #d9a06640;
+            --accent: #d9a066;
+            --accent-dark: #b87a4a;
+            --badge-bg: #262f42;
+            --badge-border: #4a5672;
+            --skill-bg: #2e364b;
+            --skill-border: #4b5672;
+            --expert-bg: #8f6a3a;
+            --expert-border: #d9a066;
+            --advanced-bg: #7a5a3a;
+            --intermediate-bg: #4a4f68;
+            --beginner-bg: #3a3f56;
+            --years-bg: #3a4a3a;
+            --extra-bg: rgba(28, 35, 50, 0.85);
+            --extra-border: #364053;
+            --tag-bg: #262f40;
+            --tag-border: #4b5672;
+            --footer-border: #2e384d;
+            --link-color: #d9b08a;
+            --link-hover: #f0c8a0;
+            --avatar-bg: radial-gradient(circle at 30% 30%, #7a6a4a, #2d241a);
+            --avatar-border: #b8955a;
+            --gradient-text: linear-gradient(135deg, #f0e0b0, #d9a066);
+            --section-icon-bg: #2a3348;
+            --border-urbex: #b8955a;
+            --border-rufing: #d9a066;
+            --border-workout: #8f7a4a;
+            --btn-bg: #262f42;
+            --btn-border: #4a5672;
+            --btn-active: #d9a066;
+            --btn-text: #b8c4da;
+            --btn-hover: #2a3348;
+            --tiktok-bg: #1f2636;
+            --tiktok-border: #4a5672;
+            --tiktok-hover-bg: #2a3348;
+            --avatar-icon: #eddcc0;
+        }
+
+        body.theme-darkred {
+            --border-card: #3d1818;
+            --text-primary: #f0d4d4;
+            --text-secondary: #d4b0b0;
+            --text-muted: #a08080;
+            --bg-category: rgba(31, 16, 16, 0.85);
+            --border-category: #3d2020;
+            --shadow-color: #cc333340;
+            --accent: #cc3333;
+            --accent-dark: #aa2222;
+            --badge-bg: #2a1616;
+            --badge-border: #5a2a2a;
+            --skill-bg: #2a1616;
+            --skill-border: #5a2a2a;
+            --expert-bg: #8f2222;
+            --expert-border: #cc3333;
+            --advanced-bg: #7a2828;
+            --intermediate-bg: #4a2828;
+            --beginner-bg: #3a1e1e;
+            --years-bg: #3a2626;
+            --extra-bg: rgba(24, 12, 12, 0.85);
+            --extra-border: #3d2020;
+            --tag-bg: #2a1616;
+            --tag-border: #5a2a2a;
+            --footer-border: #3d1818;
+            --link-color: #d9a0a0;
+            --link-hover: #f0c0c0;
+            --avatar-bg: radial-gradient(circle at 30% 30%, #6a2222, #3d0e0e);
+            --avatar-border: #b84444;
+            --gradient-text: linear-gradient(135deg, #f0c0b0, #cc3333);
+            --section-icon-bg: #2a1616;
+            --border-urbex: #b84444;
+            --border-rufing: #cc3333;
+            --border-workout: #8f3a3a;
+            --btn-bg: #2a1616;
+            --btn-border: #5a2a2a;
+            --btn-active: #cc3333;
+            --btn-text: #d4b0b0;
+            --btn-hover: #3a2020;
+            --tiktok-bg: #2a1616;
+            --tiktok-border: #5a2a2a;
+            --tiktok-hover-bg: #3a2020;
+            --avatar-icon: #eddcc0;
+        }
+
+        body.theme-black {
+            --border-card: #1a1a1a;
+            --text-primary: #e8e8e8;
+            --text-secondary: #b0b0b0;
+            --text-muted: #707070;
+            --bg-category: rgba(15, 15, 15, 0.85);
+            --border-category: #1e1e1e;
+            --shadow-color: #66666620;
+            --accent: #888888;
+            --accent-dark: #666666;
+            --badge-bg: #141414;
+            --badge-border: #2a2a2a;
+            --skill-bg: #141414;
+            --skill-border: #2a2a2a;
+            --expert-bg: #444444;
+            --expert-border: #888888;
+            --advanced-bg: #3a3a3a;
+            --intermediate-bg: #2a2a2a;
+            --beginner-bg: #1e1e1e;
+            --years-bg: #2a2a2a;
+            --extra-bg: rgba(14, 14, 14, 0.85);
+            --extra-border: #1e1e1e;
+            --tag-bg: #141414;
+            --tag-border: #2a2a2a;
+            --footer-border: #1a1a1a;
+            --link-color: #aaaaaa;
+            --link-hover: #cccccc;
+            --avatar-bg: radial-gradient(circle at 30% 30%, #333333, #111111);
+            --avatar-border: #555555;
+            --gradient-text: linear-gradient(135deg, #cccccc, #888888);
+            --section-icon-bg: #141414;
+            --border-urbex: #555555;
+            --border-rufing: #777777;
+            --border-workout: #555555;
+            --btn-bg: #141414;
+            --btn-border: #2a2a2a;
+            --btn-active: #888888;
+            --btn-text: #b0b0b0;
+            --btn-hover: #1e1e1e;
+            --tiktok-bg: #141414;
+            --tiktok-border: #2a2a2a;
+            --tiktok-hover-bg: #1e1e1e;
+            --avatar-icon: #cccccc;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-color: var(--border-card);
+        }
+
+        /* ===== КНОПКИ ТЕМ ===== */
+        .theme-switcher {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.8rem;
+            display: flex;
+            gap: 0.5rem;
+            background: var(--btn-bg);
+            padding: 0.4rem;
+            border-radius: 40px;
+            border: 1px solid var(--btn-border);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .theme-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            background: transparent;
+            color: var(--btn-text);
+            position: relative;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+            border-color: var(--btn-border);
+        }
+
+        .theme-btn.active {
+            border-color: var(--btn-active);
+            box-shadow: 0 0 16px var(--shadow-color);
+            transform: scale(1.05);
+        }
+
+        .theme-btn .color-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .theme-btn[data-theme="gold"] .color-dot {
+            background: linear-gradient(135deg, #ffcc44, #d9a066);
+        }
+        .theme-btn[data-theme="darkred"] .color-dot {
+            background: linear-gradient(135deg, #ff3333, #cc3333);
+        }
+        .theme-btn[data-theme="black"] .color-dot {
+            background: linear-gradient(135deg, #aaaaaa, #555555);
+        }
+
+        .theme-btn .fa-check {
+            display: none;
+            font-size: 0.8rem;
+            color: var(--btn-active);
+        }
+
+        .theme-btn.active .fa-check {
+            display: inline;
+        }
+        .theme-btn.active .color-dot {
+            display: none;
+        }
+
+        /* ===== ПРОФИЛЬ ===== */
+        .profile {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 2.2rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 2px solid var(--footer-border);
+            padding-bottom: 2rem;
+        }
+
+        .avatar {
+            flex-shrink: 0;
+            width: 130px;
+            height: 130px;
+            background: var(--avatar-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4.6rem;
+            color: var(--avatar-icon);
+            box-shadow: 0 12px 28px -5px var(--shadow-color);
+            border: 2px solid var(--avatar-border);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .intro h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: var(--gradient-text);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .intro .tagline {
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .intro .tagline i {
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            margin-top: 0.8rem;
+        }
+
+        .badge {
+            background: var(--badge-bg);
+            color: var(--text-primary);
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid var(--badge-border);
+            transition: all 0.3s ease;
+        }
+
+        .badge i {
+            font-size: 0.8rem;
+            color: var(--accent);
+        }
+
+        /* ===== НАВЫКИ ===== */
+        .skills-section {
+            margin: 2.5rem 0 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .section-title i {
+            color: var(--accent);
+            background: var(--section-icon-bg);
+            padding: 0.5rem 0.7rem;
+            border-radius: 16px;
+            font-size: 1.6rem;
+            transition: all 0.3s ease;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .skill-category {
+            background: var(--bg-category);
+            border-radius: 2rem;
+            padding: 1.6rem 1.4rem 1.2rem;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-category);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .skill-category:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px -12px var(--shadow-color);
+            border-color: var(--accent);
+        }
+
+        .skill-category h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1.2rem;
+            color: var(--text-primary);
+            border-bottom: 2px dashed var(--border-category);
+            padding-bottom: 0.6rem;
+        }
+
+        .skill-category h3 i {
+            color: var(--accent);
+            width: 1.8rem;
+            font-size: 1.4rem;
+        }
+
+        .skill-item {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid var(--border-category);
+        }
+
+        .skill-item:last-child {
+            border-bottom: none;
+        }
+
+        .skill-name {
+            font-weight: 500;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .skill-name i {
+            font-size: 0.9rem;
+            color: var(--accent);
+            width: 1.3rem;
+        }
+
+        .skill-level {
+            font-size: 0.75rem;
+            background: var(--skill-bg);
+            padding: 0.15rem 0.8rem;
+            border-radius: 40px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            border: 1px solid var(--skill-border);
+            transition: all 0.3s ease;
+        }
+
+        .skill-level.expert {
+            background: var(--expert-bg);
+            color: white;
+            border-color: var(--expert-border);
+        }
+
+        .skill-level.advanced {
+            background: var(--advanced-bg);
+            color: var(--text-primary);
+            border-color: var(--accent-dark);
+        }
+
+        .skill-level.intermediate {
+            background: var(--intermediate-bg);
+            color: var(--text-primary);
+        }
+
+        .skill-level.beginner {
+            background: var(--beginner-bg);
+            color: var(--text-secondary);
+        }
+
+        .skill-level.years {
+            background: var(--years-bg);
+            color: var(--text-secondary);
+            border-color: var(--skill-border);
+        }
+
+        /* ===== ДОП. БЛОКИ ===== */
+        .extra-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2.8rem;
+            border-top: 2px solid var(--footer-border);
+            padding-top: 2.2rem;
+        }
+
+        .extra-box {
+            background: var(--extra-bg);
+            border-radius: 2rem;
+            padding: 1.5rem 1.4rem;
+            border: 1px solid var(--extra-border);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .extra-box h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .extra-box h4 i {
+            color: var(--accent);
+            font-size: 1.3rem;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+
+        .tags span {
+            background: var(--tag-bg);
+            border: 1px solid var(--tag-border);
+            padding: 0.25rem 1.1rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .tags span i {
+            margin-right: 0.3rem;
+            color: var(--accent);
+            font-size: 0.8rem;
+        }
+
+        .tags span:hover {
+            background: var(--btn-hover);
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer-note {
+            margin-top: 2.8rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--footer-border);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem 1.8rem;
+        }
+
+        .footer-note i {
+            color: var(--accent);
+            margin-right: 0.3rem;
+        }
+
+        .footer-note a {
+            color: var(--link-color);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px dashed var(--border-category);
+            transition: all 0.2s ease;
+        }
+
+        .footer-note a:hover {
+            color: var(--link-hover);
+            border-bottom-color: var(--accent);
+        }
+
+        .tiktok-link {
+            font-size: 1.1rem;
+            padding: 0.2rem 1.2rem;
+            background: var(--tiktok-bg);
+            border-radius: 40px;
+            border: 1px solid var(--tiktok-border);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .tiktok-link i {
+            color: #ff0050;
+            font-size: 1.2rem;
+        }
+
+        .tiktok-link:hover {
+            background: var(--tiktok-hover-bg);
+            border-color: #ff0050;
+            box-shadow: 0 0 20px rgba(255, 0, 80, 0.15);
+        }
+
+        .tiktok-link a {
+            border-bottom: none !important;
+        }
+
+        /* ===== АДАПТИВ ===== */
+        @media (max-width: 640px) {
+            .card {
+                padding: 1.8rem 1rem;
+            }
+            .profile {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .intro h1 {
+                font-size: 2.2rem;
+            }
+            .extra-row {
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+            }
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+            .badge-group {
+                justify-content: center;
+            }
+            .footer-note {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            .theme-switcher {
+                position: static;
+                justify-content: center;
+                margin-bottom: 1rem;
+                width: fit-content;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .profile {
+                margin-top: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .avatar {
+                width: 110px;
+                height: 110px;
+                font-size: 3.8rem;
+            }
+            .theme-btn {
+                width: 32px;
+                height: 32px;
+            }
+            .theme-btn .color-dot {
+                width: 16px;
+                height: 16px;
+            }
+        }
+    </style>
+</head>
+<body class="theme-gold">
+    <!-- ===== АНИМИРОВАННЫЕ ЧАСТИЦЫ ===== -->
+    <div class="bg-particles" id="particles"></div>
+
+    <div class="card">
+        <!-- ===== КНОПКИ ПЕРЕКЛЮЧЕНИЯ ТЕМ ===== -->
+        <div class="theme-switcher">
+            <button class="theme-btn active" data-theme="gold" title="Золотая тема">
+                <span class="color-dot"></span>
+                <i class="fas fa-check"></i>
+            </button>
+            <button class="theme-btn" data-theme="darkred" title="Тёмно-красная тема">
+                <span class="color-dot"></span>
+                <i class="fas fa-check"></i>
+            </button>
+            <button class="theme-btn" data-theme="black" title="Чёрная тема">
+                <span class="color-dot"></span>
+                <i class="fas fa-check"></i>
+            </button>
+        </div>
+
+        <!-- ===== ПРОФИЛЬ ===== -->
+        <div class="profile">
+            <div class="avatar">
+                <img src="https://imgur.com/FDzN358.jpg" alt="xRex" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+            </div>
+            <div class="intro">
+                <h1>Артем «xRex»</h1>
+                <div class="tagline">
+                    <i class="fas fa-skull"></i>
+                    Urbex · Руфинг · MMA · Workout · Экстрим
+                </div>
+                <div class="badge-group">
+                    <span class="badge"><i class="fas fa-check-circle"></i> Urbex (заброшки)</span>
+                    <span class="badge"><i class="fas fa-check-circle"></i> Руфинг (высота)</span>
+                    <span class="badge"><i class="fas fa-check-circle"></i> Workout</span>
+                    <span class="badge"><i class="fas fa-check-circle"></i> Motocross</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== НАВЫКИ ===== -->
+        <div class="skills-section">
+            <div class="section-title">
+                <i class="fas fa-bolt"></i> 
+                Дисциплины &amp; увлечения
+            </div>
+
+            <div class="skills-grid">
+                <div class="skill-category" style="border-color: var(--border-urbex); border-width: 2px;">
+                    <h3><i class="fas fa-building"></i> Urbex · эксперт</h3>
+                    <div class="skill-item">
+                        <span class="skill-name"><i class="fas fa-door-open"></i> Заброшенные заводы</span>
+                        <span class="skill-level expert">Эксперт</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name"><i class="fas fa-hospital"></i> Старые больницы / бункеры</span>
+                        <span class="skill-level expert">Эксперт</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name"><i class="fas fa-train"></i> Ж/д депо, станции</span>
+                        <span class="skill-level advanced">Продвинутый</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name"><i class="fas fa-ghost"></i> Подземелья / катакомбы</span>
+                        <span class="skill-level advanced">Продвинутый</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name"><i class="fas fa-camera"></i> Фото/видео съёмка</span>
+                        <span class="skill-level expert">Эксперт</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name"><i class="fas fa-clock"></i> Стаж в urbex</span>
+                        <span class="skill-level years">2 года</span>
+                    </div>
+                </div>
+
+                <div class="skill-category" style="border-color: var(--border-rufing); border-width: 2px;">
+                    <h3><i class="fas fa-arrow-up"></i> Руфинг · эксперт</h3>
+                    <div class="skill-item">
+                        <span class="skill-name"><i class="fas fa-crown"></i> Высотные здания (>150м)</span>
+                        <span class="skill-level expert">Эксперт</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name"><i class="fas fa-tower-broadcast"></i> Телевышки, краны</span>
+                        <span class="skill-level expert">Эксперт</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name"><i class="fas fa-bolt"></i> Опасные конструкции</span>
+                        <span class="skill-level advanced">Продвинутый</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name"><i class="fas fa-video"></i> Съёмка с квадрокоптера</span>
+                        <span class="skill-level advanced">Продвинутый</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name"><i class="fas fa-clock"></i> Стаж в руфинге</span>
+                        <span class="skill-level years">2 года</span>
+                    </div>
+                </div>
+
+                <div class="skill-category" style="border-color: var(--border-workout); border-width: 2px;">
+                    <h3><i class="fas fa-dumbbell"></i> Workout · продвинутый</h3>
+                    <div class="skill-item">
+                        <span class="skill-name"><i class="fas fa-arrow-up"></i> Передний вис (фронт левер)</span>
+                        <span class="skill-level expert">Эксперт</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name"><i class="fas fa-arrow-right"></i> Выход на две (мышцы)</span>
+                        <span class="skill-level expert">Эксперт</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name"><i class="fas fa-hand-grip"></i> Подтягивания (20+ раз)</span>
+                        <span class="skill-level expert">Эксперт</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name"><i class="fas fa-flag"></i> Флаг (human flag)</span>
+                        <span class="skill-level advanced">Продвинутый</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name"><i class="fas fa-arrow-left"></i> Горизонтальный вис</span>
+                        <span class="skill-level advanced">Продвинутый</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name"><i class="fas fa-clock"></i> Стаж в workout</span>
+                        <span class="skill-level years">4 года</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ОСТАЛЬНЫЕ УВЛЕЧЕНИЯ ===== -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; margin-top: 0.5rem;">
+            <div class="skill-category" style="border-color: #4a6a7a;">
+                <h3><i class="fas fa-motorcycle"></i> Motocross &amp; активность</h3>
+                <div class="skill-item">
+                    <span class="skill-name"><i class="fas fa-motorcycle"></i> Motocross (эндуро)</span>
+                    <span class="skill-level expert">Эксперт</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name"><i class="fas fa-swimmer"></i> Плавание</span>
+                    <span class="skill-level advanced">Продвинутый</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name"><i class="fas fa-fish"></i> Рыбалка (спиннинг)</span>
+                    <span class="skill-level intermediate">Средний</span>
+                </div>
+            </div>
+            <div class="skill-category" style="border-color: #6a5a7a;">
+                <h3><i class="fas fa-music"></i> Творчество</h3>
+                <div class="skill-item">
+                    <span class="skill-name"><i class="fas fa-piano"></i> Пианино / фортепиано</span>
+                    <span class="skill-level intermediate">Средний</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name"><i class="fas fa-guitar"></i> Гитара (акустика)</span>
+                    <span class="skill-level beginner">Начальный</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name"><i class="fas fa-headphones"></i> Сведение / битмейкинг</span>
+                    <span class="skill-level intermediate">Средний</span>
+                </div>
+            </div>
+            <div class="skill-category" style="border-color: #d97a3a;">
+                <h3><i class="fas fa-shield-alt"></i> ММА &amp; Wrestling</h3>
+                <div class="skill-item">
+                    <span class="skill-name"><i class="fas fa-fist-raised"></i> ММА (ударка + борьба)</span>
+                    <span class="skill-level advanced">Продвинутый</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name"><i class="fas fa-hand-grip"></i> Wrestling (борьба)</span>
+                    <span class="skill-level advanced">Продвинутый</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name"><i class="fas fa-clock"></i> Стаж в ММА/wrestling</span>
+                    <span class="skill-level years">4 года</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ДОПОЛНИТЕЛЬНЫЕ БЛОКИ ===== -->
+        <div class="extra-row">
+            <div class="extra-box">
+                <h4><i class="fas fa-hard-hat"></i> Снаряжение Urbex &amp; Руфинг</h4>
+                <div class="tags">
+                    <span><i class="fas fa-camera"></i> Sony A7 IV + 24-70</span>
+                    <span><i class="fas fa-drone"></i> DJI Mavic 3 pro</span>
+                    <span><i class="fas fa-lightbulb"></i> Тактический фонарь</span>
+                    <span><i class="fas fa-skull"></i> Балаклава</span>
+                    <span><i class="fas fa-route"></i> GPS-трекер</span>
+                    <span><i class="fas fa-first-aid"></i> Аптечка</span>
+                </div>
+            </div>
+
+            <div class="extra-box">
+                <h4><i class="fas fa-dumbbell"></i> Soft &amp; характер</h4>
+                <div class="tags">
+                    <span><i class="fas fa-eye"></i> Внимательность</span>
+                    <span><i class="fas fa-hand-rock"></i> Хладнокровие</span>
+                    <span><i class="fas fa-clock"></i> Терпение</span>
+                    <span><i class="fas fa-map"></i> Пространственное мышление</span>
+                    <span><i class="fas fa-users"></i> Командная работа (рейды)</span>
+                    <span><i class="fas fa-brain"></i> Тактическое мышление</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div class="footer-note">
+            <span><i class="fas fa-envelope"></i> rexroof444@gmail.com</span>
+            <span class="tiktok-link">
+                <i class="fab fa-tiktok"></i> 
+                <a href="https://www.tiktok.com/@xrexulo" target="_blank" style="border-bottom: none; font-weight: 600;">@xrexulo</a>
+            </span>
+        </div>
+    </div>
+
+    <script>
+        // ===== СОЗДАНИЕ И АНИМАЦИЯ ЧАСТИЦ =====
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('particles');
+            const particles = [];
+
+            // 6 ярких цветов для каждой темы
+            const colorNames = [
+                'var(--particle1)',
+                'var(--particle2)',
+                'var(--particle3)',
+                'var(--particle4)',
+                'var(--particle5)',
+                'var(--particle6)'
+            ];
+
+            // Создаём 30 частиц (больше = ярче фон)
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const size = Math.random() * 350 + 100;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const color = colorNames[Math.floor(Math.random() * colorNames.length)];
+                
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = x + '%';
+                particle.style.top = y + '%';
+                particle.style.background = color;
+                particle.style.borderRadius = Math.random() > 0.5 ? '50%' : '40% 60% 50% 50%';
+                particle.style.opacity = 0.6 + Math.random() * 0.3;
+                
+                container.appendChild(particle);
+                
+                particles.push({
+                    el: particle,
+                    x: x,
+                    y: y,
+                    dx: (Math.random() - 0.5) * 0.8,
+                    dy: (Math.random() - 0.5) * 0.8,
+                    size: size
+                });
+            }
+
+            // Анимируем частицы
+            function animateParticles() {
+                particles.forEach(p => {
+                    p.x += p.dx;
+                    p.y += p.dy;
+                    
+                    if (p.x > 100) { p.x = 100; p.dx *= -1; }
+                    if (p.x < 0) { p.x = 0; p.dx *= -1; }
+                    if (p.y > 100) { p.y = 100; p.dy *= -1; }
+                    if (p.y < 0) { p.y = 0; p.dy *= -1; }
+                    
+                    p.el.style.left = p.x + '%';
+                    p.el.style.top = p.y + '%';
+                });
+                
+                requestAnimationFrame(animateParticles);
+            }
+
+            animateParticles();
+
+            // ===== ПЕРЕКЛЮЧЕНИЕ ТЕМ =====
+            const buttons = document.querySelectorAll('.theme-btn');
+            const body = document.body;
+
+            function setTheme(themeName) {
+                body.classList.remove('theme-gold', 'theme-darkred', 'theme-black');
+                body.classList.add('theme-' + themeName);
+                
+                buttons.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.theme === themeName) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const theme = this.dataset.theme;
+                    setTheme(theme);
+                });
+            });
+
+            setTheme('gold');
+        });
+    </script>
+</body>
+</html>
