@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Шахматы ♚</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            background: #0f0f1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            overflow: hidden;
+        }
+        .game-wrapper {
+            background: linear-gradient(160deg, #1a1a2e, #0a0a1a);
+            padding: 1.8rem 2.2rem 1.8rem;
+            border-radius: 3rem;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.95), inset 0 1px 2px rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.9rem;
+        }
+        h1 {
+            color: #e8e8e8;
+            font-weight: 300;
+            letter-spacing: 6px;
+            font-size: 1.9rem;
+            text-shadow: 0 2px 30px rgba(255,215,0,0.12);
+        }
+        h1 span { color: #f1c40f; }
+
+        .top-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .controls-group {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .controls-group label {
+            color: #8899aa;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        select, button {
+            background: #1a2a3a;
+            border: 1px solid #2a4a5a;
+            padding: 0.4rem 1.1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #ecf0f1;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 3px 0 #0a1a2a, 0 3px 10px rgba(0,0,0,0.4);
+            outline: none;
+            font-family: inherit;
+        }
+        select:hover, button:hover {
+            background: #2a4a5a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 0 #0a1a2a, 0 6px 15px rgba(0,0,0,0.5);
+        }
+        select:active, button:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #0a1a2a;
+        }
+        select option { background: #0a1a2a; }
+
+        .status-badge {
+            background: #0a1a2a;
+            padding: 0.4rem 1.3rem;
+            border-radius: 2.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #e8f0f5;
+            border: 1px solid #2a5a6a;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);
+            min-width: 140px;
+            text-align: center;
+        }
+        .undo-counter {
+            color: #f1c40f;
+            font-weight: 700;
+            font-size: 0.85rem;
+            background: #0a1a2a;
+            padding: 0.25rem 0.9rem;
+            border-radius: 1.5rem;
+            border: 1px solid #3a5a3a;
+        }
+
+        canvas {
+            display: block;
+            background: #2c3e50;
+            border-radius: 1.8rem;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), 0 20px 40px -10px #000000;
+            width: 100%;
+            max-width: 540px;
+            height: auto;
+            aspect-ratio: 1 / 1;
+            image-rendering: auto;
+            cursor: pointer;
+            transition: filter 0.3s;
+        }
+
+        /* НИЖНЯЯ ПАНЕЛЬ — СЧЁТ И ОТМЕНА */
+        .bottom-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 1rem;
+            flex-wrap: wrap;
+            padding-top: 0.3rem;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .score-display {
+            display: flex;
+            gap: 1.2rem;
+            align-items: center;
+            background: #0a1a2a;
+            padding: 0.3rem 1.2rem;
+            border-radius: 2.5rem;
+            border: 1px solid #1a3a4a;
+        }
+        .score-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .score-item .icon {
+            font-size: 1.1rem;
+        }
+        .score-item .num {
+            font-size: 1.2rem;
+            font-weight: 700;
+            min-width: 1.5rem;
+            text-align: center;
+        }
+        .score-white .num { color: #f0d9b5; }
+        .score-black .num { color: #888; }
+        .score-draw .num { color: #f39c12; }
+        .score-divider { color: #3a5a6a; font-size: 1.2rem; }
+
+        .undo-area {
+            display: flex;
+            gap: 0.6rem;
+            align-items: center;
+        }
+        .undo-area .undo-btn {
+            background: #2a3a3a;
+            border-color: #3a5a4a;
+            padding: 0.35rem 1.2rem;
+            font-size: 0.85rem;
+        }
+        .undo-area .undo-btn:hover {
+            background: #3a5a4a;
+        }
+        .undo-area .undo-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .undo-area .undo-counter {
+            font-size: 0.8rem;
+            padding: 0.2rem 0.8rem;
+        }
+
+        .hint {
+            color: #5a7a8a;
+            font-size: 0.8rem;
+            letter-spacing: 0.2px;
+        }
+        .hint span { color: #f1c40f; }
+
+        @media (max-width: 600px) {
+            .game-wrapper { padding: 0.8rem; }
+            .top-panel { flex-direction: column; align-items: stretch; }
+            .controls-group { justify-content: center; }
+            .bottom-panel { flex-direction: column; align-items: stretch; }
+            .score-display { justify-content: center; }
+            .undo-area { justify-content: center; }
+            .status-badge { text-align: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-wrapper">
+    <div class="game-container">
+        <h1>♚ <span>3D</span> ШАХМАТЫ</h1>
+
+        <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+        <div class="top-panel">
+            <div class="controls-group">
+                <label>🎨 Тема</label>
+                <select id="themeSelect">
+                    <option value="classic">Классическая</option>
+                    <option value="light">Светлая</option>
+                    <option value="dark">Тёмная</option>
+                    <option value="neon">Неоновая</option>
+                </select>
+                <label>🤖 Сложность</label>
+                <select id="difficultySelect">
+                    <option value="easy">Лёгкая</option>
+                    <option value="medium" selected>Средняя</option>
+                    <option value="hard">Сложная</option>
+                </select>
+            </div>
+            <div class="controls-group">
+                <button id="resetBtn">⟳ Новая</button>
+            </div>
+        </div>
+
+        <!-- СТАТУС -->
+        <div style="display:flex; width:100%; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.3rem;">
+            <div class="status-badge" id="statusDisplay">⚔️ Ваш ход</div>
+            <div class="undo-counter" id="turnDisplay">♔ Белые</div>
+        </div>
+
+        <!-- ДОСКА -->
+        <canvas id="gameCanvas" width="540" height="540"></canvas>
+
+        <!-- НИЖНЯЯ ПАНЕЛЬ: СЧЁТ + ОТМЕНА -->
+        <div class="bottom-panel">
+            <div class="score-display">
+                <div class="score-item score-white">
+                    <span class="icon">♔</span>
+                    <span class="num" id="whiteScore">0</span>
+                </div>
+                <span class="score-divider">:</span>
+                <div class="score-item score-black">
+                    <span class="icon">♚</span>
+                    <span class="num" id="blackScore">0</span>
+                </div>
+                <span class="score-divider">|</span>
+                <div class="score-item score-draw">
+                    <span class="icon">🤝</span>
+                    <span class="num" id="drawScore">0</span>
+                </div>
+            </div>
+            <div class="undo-area">
+                <button class="undo-btn" id="undoBtn" title="Отменить ход (3 раза за игру)">↩ Отмена</button>
+                <span class="undo-counter" id="undoCount">3</span>
+            </div>
+        </div>
+
+        <div class="hint">Клик по фигуре → по клетке · <span>бот ходит автоматически</span></div>
+    </div>
+</div>
+<script>
+    // ================================================================
+    //  3D ШАХМАТЫ — счёт, отмена внизу, понятный статус
+    // ================================================================
+    (function() {
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const statusDisplay = document.getElementById('statusDisplay');
+        const turnDisplay = document.getElementById('turnDisplay');
+        const undoCountSpan = document.getElementById('undoCount');
+        const whiteScoreSpan = document.getElementById('whiteScore');
+        const blackScoreSpan = document.getElementById('blackScore');
+        const drawScoreSpan = document.getElementById('drawScore');
+
+        const SIZE = 540;
+        const CELL = SIZE / 8;
+
+        // ---------- ТЕМЫ ----------
+        const THEMES = {
+            classic: { light: '#f0d9b5', dark: '#b58863', lightShadow: '#e8cfa0', darkShadow: '#a07850', border: '#8a7a6a', glow: 'rgba(255,215,0,0.15)' },
+            light:   { light: '#fdf6e3', dark: '#f1c40f', lightShadow: '#f0e8c0', darkShadow: '#d4a800', border: '#c9a800', glow: 'rgba(255,215,0,0.25)' },
+            dark:    { light: '#4a5a6a', dark: '#1a2a3a', lightShadow: '#3a4a5a', darkShadow: '#0a1a2a', border: '#2a4a6a', glow: 'rgba(100,150,255,0.15)' },
+            neon:    { light: '#1a1a3a', dark: '#0a0a2a', lightShadow: '#2a2a5a', darkShadow: '#050515', border: '#7a3aff', glow: 'rgba(100,50,255,0.3)' }
+        };
+        let currentTheme = 'classic';
+
+        // ---------- СОСТОЯНИЕ ----------
+        let board = [];
+        let selected = null;
+        let turn = 'white';
+        let gameOver = false;
+        let botThinking = false;
+        let moveHistory = [];
+        let undoCount = 3;
+        let difficulty = 'medium';
+
+        // СЧЁТ
+        let score = { white: 0, black: 0, draw: 0 };
+
+        // ---------- ИНИЦИАЛИЗАЦИЯ ----------
+        function initBoard() {
+            const backRank = (color) => [
+                {type: 'rook', color}, {type: 'knight', color}, {type: 'bishop', color},
+                {type: 'queen', color}, {type: 'king', color},
+                {type: 'bishop', color}, {type: 'knight', color}, {type: 'rook', color}
+            ];
+            board = [];
+            for (let r = 0; r < 8; r++) {
+                board[r] = [];
+                for (let c = 0; c < 8; c++) {
+                    if (r === 0) board[r][c] = backRank('black')[c];
+                    else if (r === 1) board[r][c] = {type: 'pawn', color: 'black'};
+                    else if (r === 6) board[r][c] = {type: 'pawn', color: 'white'};
+                    else if (r === 7) board[r][c] = backRank('white')[c];
+                    else board[r][c] = null;
+                }
+            }
+            turn = 'white';
+            gameOver = false;
+            selected = null;
+            botThinking = false;
+            moveHistory = [];
+            undoCount = 3;
+            updateUndoDisplay();
+            setStatus('⚔️ Ваш ход', '#e8f0f5');
+            turnDisplay.innerHTML = '♔ Белые';
+            turnDisplay.style.color = '#f0d9b5';
+            draw();
+        }
+
+        function updateUndoDisplay() {
+            undoCountSpan.textContent = undoCount;
+            document.getElementById('undoBtn').disabled = (undoCount <= 0 || gameOver || turn !== 'white' || botThinking || moveHistory.length === 0);
+        }
+
+        function setStatus(text, color) {
+            statusDisplay.innerHTML = text;
+            statusDisplay.style.color = color || '#e8f0f5';
+        }
+
+        function updateScoreDisplay() {
+            whiteScoreSpan.textContent = score.white;
+            blackScoreSpan.textContent = score.black;
+            drawScoreSpan.textContent = score.draw;
+        }
+
+        // ---------- КЛОНИРОВАНИЕ ----------
+        function cloneBoard(b) {
+            return b.map(row => row.map(cell => cell ? {...cell} : null));
+        }
+
+        function findKing(b, color) {
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const cell = b[r][c];
+                    if (cell && cell.type === 'king' && cell.color === color) return {row: r, col: c};
+                }
+            }
+            return null;
+        }
+
+        function isUnderAttack(b, row, col, byColor) {
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const cell = b[r][c];
+                    if (!cell || cell.color !== byColor) continue;
+                    const moves = getRawMoves(b, r, c);
+                    for (let m of moves) {
+                        if (m.row === row && m.col === col) return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function getRawMoves(b, row, col) {
+            const cell = b[row][col];
+            if (!cell) return [];
+            const {type, color} = cell;
+            const moves = [];
+            const enemy = color === 'white' ? 'black' : 'white';
+            const inBounds = (r, c) => r >= 0 && r < 8 && c >= 0 && c < 8;
+
+            const addMove = (r, c) => {
+                if (!inBounds(r, c)) return false;
+                const target = b[r][c];
+                if (target && target.color === color) return false;
+                moves.push({row: r, col: c});
+                return !target;
+            };
+
+            switch (type) {
+                case 'pawn': {
+                    const dir = color === 'white' ? -1 : 1;
+                    const startRow = color === 'white' ? 6 : 1;
+                    if (inBounds(row + dir, col) && !b[row + dir][col]) {
+                        moves.push({row: row + dir, col});
+                        if (row === startRow && !b[row + 2*dir][col]) moves.push({row: row + 2*dir, col});
+                    }
+                    for (let dc of [-1, 1]) {
+                        const nr = row + dir, nc = col + dc;
+                        if (inBounds(nr, nc)) {
+                            const target = b[nr][nc];
+                            if (target && target.color === enemy) moves.push({row: nr, col: nc});
+                        }
+                    }
+                    break;
+                }
+                case 'knight': {
+                    for (let dr of [-2, -1, 1, 2]) for (let dc of [-2, -1, 1, 2]) {
+                        if (Math.abs(dr) === Math.abs(dc)) continue;
+                        const nr = row + dr, nc = col + dc;
+                        if (!inBounds(nr, nc)) continue;
+                        const target = b[nr][nc];
+                        if (target && target.color === color) continue;
+                        moves.push({row: nr, col: nc});
+                    }
+                    break;
+                }
+                case 'bishop': {
+                    for (let dr of [-1, 1]) for (let dc of [-1, 1]) {
+                        for (let i = 1; i < 8; i++) {
+                            if (!addMove(row + dr*i, col + dc*i)) break;
+                        }
+                    }
+                    break;
+                }
+                case 'rook': {
+                    for (let dr of [-1, 1]) for (let i = 1; i < 8; i++) {
+                        if (!addMove(row + dr*i, col)) break;
+                    }
+                    for (let dc of [-1, 1]) for (let i = 1; i < 8; i++) {
+                        if (!addMove(row, col + dc*i)) break;
+                    }
+                    break;
+                }
+                case 'queen': {
+                    for (let dr of [-1, 0, 1]) for (let dc of [-1, 0, 1]) {
+                        if (dr === 0 && dc === 0) continue;
+                        for (let i = 1; i < 8; i++) {
+                            if (!addMove(row + dr*i, col + dc*i)) break;
+                        }
+                    }
+                    break;
+                }
+                case 'king': {
+                    for (let dr of [-1, 0, 1]) for (let dc of [-1, 0, 1]) {
+                        if (dr === 0 && dc === 0) continue;
+                        addMove(row + dr, col + dc);
+                    }
+                    break;
+                }
+            }
+            return moves;
+        }
+
+        function getLegalMoves(b, row, col) {
+            const cell = b[row][col];
+            if (!cell) return [];
+            const raw = getRawMoves(b, row, col);
+            const legal = [];
+            for (let m of raw) {
+                const sim = cloneBoard(b);
+                sim[m.row][m.col] = sim[row][col];
+                sim[row][col] = null;
+                const king = findKing(sim, cell.color);
+                if (king && !isUnderAttack(sim, king.row, king.col, cell.color === 'white' ? 'black' : 'white')) {
+                    legal.push(m);
+                }
+            }
+            return legal;
+        }
+
+        function getAllMoves(b, color) {
+            const all = [];
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const cell = b[r][c];
+                    if (cell && cell.color === color) {
+                        const moves = getLegalMoves(b, r, c);
+                        for (let m of moves) {
+                            all.push({fromRow: r, fromCol: c, toRow: m.row, toCol: m.col});
+                        }
+                    }
+                }
+            }
+            return all;
+        }
+
+        function checkGameState(b, color) {
+            const moves = getAllMoves(b, color);
+            if (moves.length > 0) return 'playing';
+            const king = findKing(b, color);
+            if (king && isUnderAttack(b, king.row, king.col, color === 'white' ? 'black' : 'white')) {
+                return 'checkmate';
+            }
+            return 'stalemate';
+        }
+
+        // ---------- ОЦЕНКА ДЛЯ БОТА ----------
+        function evaluateBoard(b) {
+            const values = {pawn: 10, knight: 30, bishop: 30, rook: 50, queen: 90, king: 900};
+            let score = 0;
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const cell = b[r][c];
+                    if (!cell) continue;
+                    const val = values[cell.type] || 0;
+                    score += cell.color === 'black' ? val : -val;
+                }
+            }
+            return score;
+        }
+
+        function minimax(b, depth, isMaximizing, alpha, beta) {
+            if (depth === 0) return {score: evaluateBoard(b)};
+            const color = isMaximizing ? 'black' : 'white';
+            const moves = getAllMoves(b, color);
+            if (moves.length === 0) {
+                const state = checkGameState(b, color);
+                if (state === 'checkmate') return {score: isMaximizing ? -9999 + depth : 9999 - depth};
+                return {score: 0};
+            }
+            let bestMove = moves[0];
+            if (isMaximizing) {
+                let maxEval = -Infinity;
+                for (let m of moves) {
+                    const sim = cloneBoard(b);
+                    sim[m.toRow][m.toCol] = sim[m.fromRow][m.fromCol];
+                    sim[m.fromRow][m.fromCol] = null;
+                    const result = minimax(sim, depth - 1, false, alpha, beta);
+                    if (result.score > maxEval) { maxEval = result.score; bestMove = m; }
+                    alpha = Math.max(alpha, maxEval);
+                    if (beta <= alpha) break;
+                }
+                return {score: maxEval, move: bestMove};
+            } else {
+                let minEval = Infinity;
+                for (let m of moves) {
+                    const sim = cloneBoard(b);
+                    sim[m.toRow][m.toCol] = sim[m.fromRow][m.fromCol];
+                    sim[m.fromRow][m.fromCol] = null;
+                    const result = minimax(sim, depth - 1, true, alpha, beta);
+                    if (result.score < minEval) { minEval = result.score; bestMove = m; }
+                    beta = Math.min(beta, minEval);
+                    if (beta <= alpha) break;
+                }
+                return {score: minEval, move: bestMove};
+            }
+        }
+
+        // ---------- ХОД БОТА ----------
+        function botMove() {
+            if (botThinking || gameOver || turn !== 'black') return;
+            botThinking = true;
+            setStatus('🤖 Бот думает...', '#f1c40f');
+
+            setTimeout(() => {
+                const moves = getAllMoves(board, 'black');
+                if (moves.length === 0) {
+                    botThinking = false;
+                    finishGame('black');
+                    return;
+                }
+
+                let move;
+                const depth = difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : 3;
+                if (difficulty === 'easy' || moves.length > 25) {
+                    let bestMoves = [];
+                    let bestScore = -Infinity;
+                    for (let m of moves) {
+                        const target = board[m.toRow][m.toCol];
+                        let score = target ? {pawn:10, knight:30, bishop:30, rook:50, queen:90, king:900}[target.type] || 0 : 0;
+                        score += Math.random() * 3;
+                        if (score > bestScore) { bestScore = score; bestMoves = [m]; }
+                        else if (Math.abs(score - bestScore) < 0.01) bestMoves.push(m);
+                    }
+                    move = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+                } else {
+                    const result = minimax(board, depth, true, -Infinity, Infinity);
+                    move = result.move || moves[0];
+                }
+
+                const captured = board[move.toRow][move.toCol];
+                moveHistory.push({
+                    fromRow: move.fromRow, fromCol: move.fromCol,
+                    toRow: move.toRow, toCol: move.toCol,
+                    piece: board[move.fromRow][move.fromCol],
+                    captured: captured
+                });
+
+                board[move.toRow][move.toCol] = board[move.fromRow][move.fromCol];
+                board[move.fromRow][move.fromCol] = null;
+
+                const piece = board[move.toRow][move.toCol];
+                if (piece && piece.type === 'pawn' && (move.toRow === 0 || move.toRow === 7)) {
+                    board[move.toRow][move.toCol] = {type: 'queen', color: piece.color};
+                }
+
+                turn = 'white';
+                botThinking = false;
+                updateUndoDisplay();
+
+                const state = checkGameState(board, 'white');
+                if (state === 'checkmate' || state === 'stalemate') {
+                    finishGame('white');
+                    return;
+                }
+
+                setStatus('⚔️ Ваш ход', '#e8f0f5');
+                turnDisplay.innerHTML = '♔ Белые';
+                turnDisplay.style.color = '#f0d9b5';
+                selected = null;
+                draw();
+            }, 300);
+        }
+
+        // ---------- ЗАВЕРШЕНИЕ ИГРЫ ----------
+        function finishGame(loserColor) {
+            gameOver = true;
+            const winner = loserColor === 'white' ? 'black' : 'white';
+            const state = checkGameState(board, loserColor);
+
+            if (state === 'checkmate') {
+                if (winner === 'white') {
+                    score.white++;
+                    setStatus('🎉 МАТ! Победили белые!', '#2ecc71');
+                } else {
+                    score.black++;
+                    setStatus('😵 МАТ! Победили чёрные!', '#e74c3c');
+                }
+            } else {
+                score.draw++;
+                setStatus('🤝 Пат! Ничья', '#f39c12');
+            }
+            updateScoreDisplay();
+            turnDisplay.innerHTML = '🏁 Игра окончена';
+            turnDisplay.style.color = '#f39c12';
+            draw();
+        }
+
+        // ---------- ОТМЕНА ХОДА ----------
+        function undoMove() {
+            if (gameOver || turn !== 'white' || botThinking || undoCount <= 0 || moveHistory.length === 0) return;
+
+            const last = moveHistory.pop();
+            board[last.fromRow][last.fromCol] = last.piece;
+            board[last.toRow][last.toCol] = last.captured || null;
+
+            if (moveHistory.length > 0) {
+                const prev = moveHistory.pop();
+                board[prev.fromRow][prev.fromCol] = prev.piece;
+                board[prev.toRow][prev.toCol] = prev.captured || null;
+            }
+
+            undoCount--;
+            updateUndoDisplay();
+            turn = 'white';
+            selected = null;
+            gameOver = false;
+            setStatus('↩ Ход отменён!', '#f1c40f');
+            turnDisplay.innerHTML = '♔ Белые';
+            turnDisplay.style.color = '#f0d9b5';
+            draw();
+
+            setTimeout(() => {
+                if (!gameOver && turn === 'white') {
+                    setStatus('⚔️ Ваш ход', '#e8f0f5');
+                }
+            }, 800);
+        }
+
+        // ---------- ХОД ИГРОКА ----------
+        function playerMove(row, col) {
+            if (gameOver || turn !== 'white' || botThinking) return;
+
+            const cell = board[row][col];
+            if (selected === null) {
+                if (cell && cell.color === 'white') {
+                    const moves = getLegalMoves(board, row, col);
+                    if (moves.length > 0) { selected = {row, col}; draw(); }
+                }
+                return;
+            }
+
+            const from = selected;
+            if (from.row === row && from.col === col) { selected = null; draw(); return; }
+
+            const legal = getLegalMoves(board, from.row, from.col);
+            const isValid = legal.some(m => m.row === row && m.col === col);
+            if (!isValid) { selected = null; draw(); return; }
+
+            const captured = board[row][col];
+            moveHistory.push({
+                fromRow: from.row, fromCol: from.col,
+                toRow: row, toCol: col,
+                piece: board[from.row][from.col],
+                captured: captured
+            });
+
+            board[row][col] = board[from.row][from.col];
+            board[from.row][from.col] = null;
+
+            const piece = board[row][col];
+            if (piece && piece.type === 'pawn' && (row === 0 || row === 7)) {
+                board[row][col] = {type: 'queen', color: piece.color};
+            }
+
+            selected = null;
+            turn = 'black';
+            updateUndoDisplay();
+            turnDisplay.innerHTML = '♚ Чёрные';
+            turnDisplay.style.color = '#1a1a1a';
+
+            const state = checkGameState(board, 'black');
+            if (state === 'checkmate' || state === 'stalemate') {
+                finishGame('black');
+                draw();
+                return;
+            }
+
+            draw();
+            setTimeout(() => botMove(), 200);
+        }
+
+        // ---------- ОТРИСОВКА ----------
+        function draw() {
+            const theme = THEMES[currentTheme] || THEMES.classic;
+            ctx.clearRect(0, 0, SIZE, SIZE);
+
+            const grad = ctx.createRadialGradient(SIZE/2, SIZE/2, 50, SIZE/2, SIZE/2, SIZE);
+            grad.addColorStop(0, theme.light);
+            grad.addColorStop(1, theme.dark);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, SIZE, SIZE);
+
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const x = c * CELL, y = r * CELL;
+                    const isLight = (r + c) % 2 === 0;
+                    ctx.fillStyle = isLight ? theme.light : theme.dark;
+                    ctx.fillRect(x, y, CELL, CELL);
+                    ctx.shadowColor = 'rgba(0,0,0,0.08)';
+                    ctx.shadowBlur = 3;
+                    ctx.shadowOffsetX = 1;
+                    ctx.shadowOffsetY = 1;
+                    ctx.strokeStyle = isLight ? theme.lightShadow : theme.darkShadow;
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(x, y, CELL, CELL);
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                }
+            }
+
+            if (selected) {
+                const x = selected.col * CELL, y = selected.row * CELL;
+                ctx.fillStyle = 'rgba(255, 255, 100, 0.2)';
+                ctx.fillRect(x, y, CELL, CELL);
+                ctx.strokeStyle = 'rgba(255, 215, 0, 0.5)';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(x, y, CELL, CELL);
+
+                const moves = getLegalMoves(board, selected.row, selected.col);
+                for (let m of moves) {
+                    const mx = m.col * CELL + CELL/2, my = m.row * CELL + CELL/2;
+                    const target = board[m.row][m.col];
+                    if (target) {
+                        ctx.strokeStyle = 'rgba(255, 50, 50, 0.5)';
+                        ctx.lineWidth = 4;
+                        ctx.beginPath();
+                        ctx.arc(mx, my, CELL/2 - 4, 0, 2*Math.PI);
+                        ctx.stroke();
+                    } else {
+                        ctx.beginPath();
+                        ctx.arc(mx, my, 10, 0, 2*Math.PI);
+                        ctx.fillStyle = 'rgba(0, 200, 80, 0.3)';
+                        ctx.fill();
+                    }
+                }
+            }
+
+            ctx.strokeStyle = theme.border;
+            ctx.lineWidth = 2.5;
+            ctx.shadowColor = theme.glow;
+            ctx.shadowBlur = 15;
+            ctx.strokeRect(0, 0, SIZE, SIZE);
+            ctx.shadowBlur = 0;
+
+            const symbols = { king: '♚', queen: '♛', rook: '♜', bishop: '♝', knight: '♞', pawn: '♟' };
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const cell = board[r][c];
+                    if (!cell) continue;
+                    const x = c * CELL, y = r * CELL;
+                    const fontSize = CELL * 0.78;
+                    ctx.font = `${fontSize}px serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    ctx.shadowColor = 'rgba(0,0,0,0.6)';
+                    ctx.shadowBlur = 18;
+                    ctx.shadowOffsetX = 3;
+                    ctx.shadowOffsetY = 3;
+                    ctx.fillStyle = cell.color === 'white' ? '#ffffff' : '#1a1a1a';
+                    ctx.fillText(symbols[cell.type], x + CELL/2, y + CELL/2 + 2);
+
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.strokeStyle = cell.color === 'white' ? '#888' : '#000';
+                    ctx.lineWidth = 1.2;
+                    ctx.strokeText(symbols[cell.type], x + CELL/2, y + CELL/2 + 2);
+
+                    ctx.fillStyle = cell.color === 'white' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.02)';
+                    ctx.fillText(symbols[cell.type], x + CELL/2 - 2, y + CELL/2 - 2);
+                }
+            }
+
+            const grad2 = ctx.createRadialGradient(0, 0, 10, SIZE/2, SIZE/2, SIZE);
+            grad2.addColorStop(0, 'rgba(255,255,255,0.02)');
+            grad2.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = grad2;
+            ctx.fillRect(0, 0, SIZE, SIZE);
+        }
+
+        // ---------- ОБРАБОТЧИКИ ----------
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+            const col = Math.floor(x / CELL);
+            const row = Math.floor(y / CELL);
+            if (row >= 0 && row < 8 && col >= 0 && col < 8) playerMove(row, col);
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            initBoard();
+            if (turn === 'black') setTimeout(() => botMove(), 300);
+        });
+
+        document.getElementById('undoBtn').addEventListener('click', undoMove);
+
+        document.getElementById('themeSelect').addEventListener('change', (e) => {
+            currentTheme = e.target.value;
+            draw();
+        });
+
+        document.getElementById('difficultySelect').addEventListener('change', (e) => {
+            difficulty = e.target.value;
+        });
+
+        // ---------- СТАРТ ----------
+        initBoard();
+        updateScoreDisplay();
+    })();
+</script>
+</body>
+</html>
